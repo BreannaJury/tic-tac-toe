@@ -1,43 +1,54 @@
 #playing board
-board = {'A1': ' ', 'A2': ' ', 'A3': ' ',
-		 'B1': ' ', 'B2': ' ', 'B3': ' ',
-		 'C1': ' ', 'C2': ' ', 'C3': ' ',}
+#board[][] = new char[][]
+#board = {'A1': ' ', 'A2': ' ', 'A3': ' ',
+#		 'B1': ' ', 'B2': ' ', 'B3': ' ',
+#		 'C1': ' ', 'C2': ' ', 'C3': ' ',}
 
-boardList = ["A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3"]
+#boardList = ["A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3"]
 
-def printBoard():
-	print('   1 2 3')
-	print(' ')
-	print('A  ' + board['A1'] + '|' + board['A2'] + '|' + board['A3'])
-	print('   -+-+-')
-	print('B  ' + board['B1'] + '|' + board['B2'] + '|' + board['B3'])
-	print('   -+-+-')
-	print('C  ' + board['C1'] + '|' + board['C2'] + '|' + board['C3'])
+def printBoard(size, board):
+	for i in range (size):
+		for j in range (size-1):
+			print(board[i][j], end = "|")
+		print(board[i][size-1])
+		if i != size-1:
+			for k in range(size):
+				print("--", end = "")
+			print()
 
-def play(player):
-	pos=input("Make your turn "+player+": ")
-	if pos in board:
-		if board[pos] == ' ':
+def play(player, size):
+	print("Make your turn "+player+": ")
+	rowInput = int(input("Row: (0 - "+size-1+") "))
+	colInput = int(input("Column: (0 - "+size-1+") "))
+	#if pos in board:
+	if board[rowInput][colInput] == ' ':
 			#allowed input
-			boardList.remove(pos)
-			if player == "Player 1":
-				board[pos] = 'X'
-			else:
-				board[pos] = 'O'
+	#	boardList.remove(pos)
+		if player == "Player 1":
+			board[rowInput][colInput] = 'X'
 		else:
-			print("That space is already taken")
-			play(player)
+			board[rowInput][colInput] = 'O'
 	else:
-		print("That is not a valid position")
-		play(player)
+	#	print("That space is already taken")
+		print("You cannot play there")
+		play(player, size)
+	#else:
+	#	print("That is not a valid position")
+	#	play(player)
 
-def computer():
+def computer(size, board):
 	import random
-	r = random.randint(0, len(boardList))
-	pos = boardList[r]
-	print("The computer played "+pos)
-	board[pos] = 'O'
-	boardList.remove(pos)
+	valid=True
+	while valid:
+		rowRand = random.randint(0, size)
+		colRand = random.randint(0, size)
+		if board[rowRand][colRand] == ' ':
+			board[rowRand][colRand] = 'O'
+			valid=False
+	#pos = boardList[r]
+	print("The computer played "+ rowRand + ", " + colRand)
+	#board[pos] = 'O'
+	#boardList.remove(pos)
 
 def winner(player, gameType):
 	printBoard()
@@ -100,20 +111,38 @@ def start(player, count, gameType):
 	checkWinner(player, count, gameType)
 
 
-def game(player, count):
+print("Welcome to Tic Tac Toe")
+#get game type
+valid=True
+while valid:
 	gType = input("Would you like to play against a friend or the computer? (Enter f or c) ")
-	if gType == "f":
-		start(player, count, gType)
+	if gType == "f":		
+		valid=False
 	elif gType == "c":
-		start(player, count, gType)
+		valid=False
 	else:
 		print("Please enter a valid input")
-		game(player, count)
+		
+#get board size
+valid=True
+while valid:
+	size=int(input("Enter the size of the board (e.g. 3x3 = 3) (3-9) "))
+	if size < 3:
+		print("That is too small")
+	elif size > 9:
+		print("That is too large")
+	else:
+		valid=False
 
+#build board
+rows,cols = (size, size)
+board = [[0 for i in range(cols)] for j in range(rows)]
+for i in range(rows):
+	for j in range(cols):
+		board[i][j] = ' '
 
-#size=input("Enter the size of the board (e.g. 3x3 = 3) (3-9) ")
 player = "Player 1"
 count = 0
-print("Welcome to Tic Tac Toe")
-
-game(player, count)
+printBoard(size, board)
+#start(player, count, gType)
+#game(player, count)
