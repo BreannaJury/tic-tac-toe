@@ -1,10 +1,9 @@
-#playing board
-#board[][] = new char[][]
-#board = {'A1': ' ', 'A2': ' ', 'A3': ' ',
-#		 'B1': ' ', 'B2': ' ', 'B3': ' ',
-#		 'C1': ' ', 'C2': ' ', 'C3': ' ',}
-
-#boardList = ["A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3"]
+#player = "Player 1"
+#gameType = "f"
+#size = 0
+#count = 0
+#rowPos = 0
+#colPos = 0
 
 def printBoard(size, board):
 	for i in range (size):
@@ -16,42 +15,40 @@ def printBoard(size, board):
 				print("--", end = "")
 			print()
 
-def play(player, size):
+def play(player, size, board, count, gameType): 
+	count = count + 1
 	print("Make your turn "+player+": ")
-	rowInput = int(input("Row: (0 - "+size-1+") "))
-	colInput = int(input("Column: (0 - "+size-1+") "))
-	#if pos in board:
-	if board[rowInput][colInput] == ' ':
+	validRange = str(size - 1)
+	rowPos = int(input("Row: (0 - "+validRange+"): "))
+	colPos = int(input("Column: (0 - "+validRange+"): "))
+	if board[rowPos][colPos] == ' ':
 			#allowed input
-	#	boardList.remove(pos)
 		if player == "Player 1":
-			board[rowInput][colInput] = 'X'
+			board[rowPos][colPos] = 'X'
 		else:
-			board[rowInput][colInput] = 'O'
+			board[rowPos][colPos] = 'O'
+		checkWinner(player, count, gameType, board, rowPos, colPos)
 	else:
-	#	print("That space is already taken")
 		print("You cannot play there")
-		play(player, size)
-	#else:
-	#	print("That is not a valid position")
-	#	play(player)
+		play(player, size, board)
 
-def computer(size, board):
+
+def computer(size, board, player, count, gameType):
+	count = count + 1
 	import random
 	valid=True
 	while valid:
-		rowRand = random.randint(0, size)
-		colRand = random.randint(0, size)
-		if board[rowRand][colRand] == ' ':
-			board[rowRand][colRand] = 'O'
+		rowPos = random.randint(0, size)
+		colPos = random.randint(0, size)
+		if board[rowPos][colPos] == ' ':
+			board[rowPos][colPos] = 'O'
 			valid=False
-	#pos = boardList[r]
-	print("The computer played "+ rowRand + ", " + colRand)
-	#board[pos] = 'O'
-	#boardList.remove(pos)
+	print("The computer played "+ rowPos + ", " + colPos)
+	checkWinner(player, count, gameType, board, rowPos, colPos)
 
-def winner(player, gameType):
-	printBoard()
+def winner(player, gameType, board): 
+	printBoard(size, board)
+	print("check2")
 	if gameType == "c":
 		if player == "Player 1":
 			print("The computer is the winner :(")
@@ -63,62 +60,78 @@ def winner(player, gameType):
 		else:
 			print("Player 1 is the winner!")
 
-def checkWinner(player, count, gameType):
-	#horizontals
-	if board['A1'] == board['A2'] == board['A3'] != ' ':
-		winner(player, gameType)
-	elif board['B1'] == board['B2'] == board['B3'] != ' ':
-		winner(player, gameType)
-	elif board['C1'] == board['C2'] == board['C3'] != ' ':
-		winner(player, gameType)
-	#verticals
-	elif board['A1'] == board['B1'] == board['C1'] != ' ':
-		winner(player, gameType)
-	elif board['A2'] == board['B2'] == board['C2'] != ' ':
-		winner(player, gameType)
-	elif board['A3'] == board['B3'] == board['C3'] != ' ':
-		winner(player, gameType)
-	#diagonals
-	elif board['A1'] == board['B2'] == board['C3'] != ' ':
-		winner(player, gameType)
-	elif board['A3'] == board['B2'] == board['C1'] != ' ':
-		winner(player, gameType)
-	#tie
-	elif count == 9:
-		print("You have tied")
-	#no winner yet
-	else:
-		start(player, count, gameType)
+def checkWinner(player, count, gameType, board, rowPos, colPos):
+	#row
+	win = True
+	for i in range(size-1):
+		if board[rowPos][i] != board[rowPos][i+1]:
+			win = False
+	if win:
+		print("check1")
+		winner(player, gameType, board)
 
-def start(player, count, gameType):
-	printBoard()
+	#col
+	win = True
+	for i in range(size-1):
+		if board[i][colPos] != board[i+1][colPos]:
+			win = False
+	if win:
+		winner(player, gameType, board)
+
+	#forward diagonal
+	if rowPos == colPos:
+		win = True
+		for i in range(size-1):
+			if board[i][i] != board[i+1][i+1]:
+				win = False
+		if win:
+			winner(player, gameType, board)
+
+	#back diagonal
+	if rowPos + colPos == size-1:
+		win = True
+		for i in range(size-1):
+			if board[i][size-1-i] != board[i+1][size-2-i]:
+				win = False
+		if win:
+			winner(player, gameType, board)
+
+	elif count == size*size:
+		print("You have tied")
+
+	else:
+		start(player, count, gameType, size, board)
+
+
+def start(player, count, gameType, size, board): 
+	printBoard(size, board)
 	#2 player
 	if gameType == "f":
-		play(player)
 		if player == "Player 1":
 			player = "Player 2"
+			play(player, size, board, count, gameType)
 		else:
 			player = "Player 1"
+			play(player, size, board, count, gameType)
 	#1 player vs computer
 	else:
 		if player == "Player 1":
-			play(player)
+
 			player = "The computer"
+			computer(size, board, player, count, gameType)
 		else:
-			computer()
 			player = "Player 1"
-	count = count + 1
-	checkWinner(player, count, gameType)
+			play(player, size, board, count, gameType)
 
 
 print("Welcome to Tic Tac Toe")
 #get game type
 valid=True
 while valid:
-	gType = input("Would you like to play against a friend or the computer? (Enter f or c) ")
-	if gType == "f":		
+	gameType = input("Would you like to play against a friend or the computer? (Enter f or c) ")
+	if gameType == 'f':		
 		valid=False
-	elif gType == "c":
+	elif gameType == 'c':
 		valid=False
 	else:
 		print("Please enter a valid input")
@@ -141,8 +154,9 @@ for i in range(rows):
 	for j in range(cols):
 		board[i][j] = ' '
 
-player = "Player 1"
 count = 0
+player = 'Player 1'
 printBoard(size, board)
-#start(player, count, gType)
-#game(player, count)
+play(player, size, board, count, gameType)
+#start(player, count, gameType, size, board)
+
